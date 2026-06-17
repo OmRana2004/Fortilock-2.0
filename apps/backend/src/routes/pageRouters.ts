@@ -5,7 +5,7 @@ import { signin } from "../controllers/auth/signin"
 
 const router = Router();
 
-router.post("./signup", signup)
-router.post("./signin", signin);
+router.post("/signup", signup)
+router.post("/signin", signin);
 
 export default router;
