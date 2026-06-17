@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../db";
-import { SigninUserSchema } from "../../common/types";
+import { LoginUserSchema } from "../../common/types";
 
-export const signin = async (req: Request, res: Response) => {
-  const parsed = SigninUserSchema.safeParse(req.body);
+export const login = async (req: Request, res: Response) => {
+  const parsed = LoginUserSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({

@@ -4,7 +4,7 @@ import { z } from "zod";
 
 /* User signup */
 
-export const CreateUserSchema = z.object({
+export const AdminUserSchema = z.object({
   email: z
     .string()
     .email("Please enter a valid email address")
@@ -21,7 +21,7 @@ export const CreateUserSchema = z.object({
 
 /* User signin */
 
-export const SigninUserSchema = z.object({
+export const LoginUserSchema = z.object({
   email: z
     .string()
     .email("Please enter a valid email address")
@@ -33,3 +33,29 @@ export const SigninUserSchema = z.object({
 
   password: z.string().min(6).max(100),
 });
+
+export const CustomerSchema = z.object({
+    name: z.string("").min(2).max(26),
+    password: z.string().min(6, "Password must be 6 character").max(100),
+    email: z
+    .string()
+    .email("Please enter a valid email address")
+    .min(3)
+    .max(500)
+    .refine((email) => email.includes("@"), {
+      message: "Email must contain @",
+    }),
+})
+
+export const DealerSchema = z.object({
+    name: z.string("").min(2).max(26),
+    password: z.string().min(6, "Password must be 6 character").max(100),
+    email: z
+    .string()
+    .email("Please enter a valid email address")
+    .min(3)
+    .max(500)
+    .refine((email) => email.includes("@"), {
+      message: "Email must contain @",
+    }),
+})

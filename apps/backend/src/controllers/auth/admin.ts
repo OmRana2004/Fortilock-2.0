@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../../db";
-import { CreateUserSchema } from "../../common/types";
+import { AdminUserSchema } from "../../common/types";
 
-export const signup = async (req: Request, res: Response) => {
-  const parsed = CreateUserSchema.safeParse(req.body);
+export const admin = async (req: Request, res: Response) => {
+  const parsed = AdminUserSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({
@@ -33,6 +33,7 @@ export const signup = async (req: Request, res: Response) => {
         password: hashedPassword,
         name,
         photo: "",
+        role: "ADMIN",
       },
     });
 
