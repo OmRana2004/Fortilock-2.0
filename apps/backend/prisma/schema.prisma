@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,17 +8,102 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
+  SUPER_ADMIN
   DEALER
   CUSTOMER
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role
-  photo     String?
+  id String @id @default(uuid())
+
+  name String
+
+  email    String @unique
+  password String
+
+  role Role
+
+  isActive Boolean @default(true)
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dealer   Dealer?
+  customer Customer?
+}
+
+model Dealer {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  shopName      String
+  contactPerson String
+
+  gender Gender?
+
+  phone String @unique
+
+  dateOfBirth DateTime?
+
+  yearOfEstablishment Int?
+
+  address String?
+
+  aadharCard   String?
+  aadharNumber String? @unique
+
+  panCard   String?
+  panNumber String? @unique
+
+  gstCertificate String?
+  gstNumber      String?
+
+  isActive Boolean @default(true)
+
+  customers Customer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  dealerId String
+  dealer   Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  customerName String
+
+  gender Gender?
+
+  phone          String  @unique
+  alternatePhone String?
+
+  email String? @unique
+
+  dateOfBirth DateTime?
+
+  address String?
+
+  bankName      String?
+  ifscCode      String?
+  accountNumber String?
+
+  photo String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
