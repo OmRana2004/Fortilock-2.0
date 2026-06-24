@@ -19,6 +19,18 @@ enum Gender {
   OTHER
 }
 
+enum LoanStatus {
+  ACTIVE
+  COMPLETED
+  DEFAULTED
+}
+
+enum EmiStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -70,6 +82,8 @@ model Dealer {
 
   customers Customer[]
 
+  deviceSales DeviceSale[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -78,16 +92,16 @@ model Customer {
   id String @id @default(uuid())
 
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   dealerId String
-  dealer   Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  dealer Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
 
   customerName String
 
   gender Gender?
 
-  phone          String  @unique
+  phone String @unique
   alternatePhone String?
 
   email String? @unique
@@ -96,13 +110,91 @@ model Customer {
 
   address String?
 
-  bankName      String?
-  ifscCode      String?
+  bankName String?
+  ifscCode String?
   accountNumber String?
 
   photo String?
 
   isActive Boolean @default(true)
+
+  deviceSales DeviceSale[]
+
+  loans Loan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeviceSale {
+  id String @id @default(uuid())
+
+  dealerId String
+  dealer Dealer @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  brand String
+  model String
+
+  imei String @unique
+
+  salePrice Float
+
+  purchaseDate DateTime @default(now())
+  loan Loan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Loan {
+  id String @id @default(uuid())
+
+  customerId String
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  deviceSaleId String @unique
+  deviceSale DeviceSale @relation(fields: [deviceSaleId], references: [id], onDelete: Cascade)
+
+  totalAmount Float
+
+  downPayment Float
+
+  financedAmount Float
+
+  tenureMonths Int
+
+  monthlyEmi Float
+
+  startDate DateTime
+
+  status LoanStatus @default(ACTIVE)
+
+  emis Emi[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Emi {
+  id String @id @default(uuid())
+
+  loanId String
+  loan Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  installmentNumber Int
+
+  dueDate DateTime
+
+  amount Float
+
+  paidAmount Float @default(0)
+
+  paidAt DateTime?
+
+  status EmiStatus @default(PENDING)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

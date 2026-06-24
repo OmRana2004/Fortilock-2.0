@@ -4,6 +4,12 @@ import { dashboard } from "../controllers/dealer/dashboard";
 import { createCustomer } from "../controllers/dealer/createCustomer";
 import { getCustomers } from "../controllers/dealer/getCustomers";
 
+import { createDeviceSale } from "../controllers/dealer/createDeviceSale";
+import { getDeviceSales } from "../controllers/dealer/getDeviceSales";
+import { getDeviceSaleById } from "../controllers/dealer/getDeviceSaleById";
+
+import { createLoan } from "../controllers/dealer/createLoan";
+
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { dealerMiddleware } from "../middlewares/dealerMiddleware";
 import { deleteCustomer } from "../controllers/dealer/deleteCustomer";
@@ -53,5 +59,33 @@ router.delete(
   dealerMiddleware,
   deleteCustomer
 );  
+
+router.post(
+  "/device-sales",
+  authMiddleware,
+  dealerMiddleware,
+  createDeviceSale
+);
+
+router.get(
+  "/device-sales",
+  authMiddleware,
+  dealerMiddleware,
+  getDeviceSales
+);
+
+router.get(
+  "/device-sales/:id",
+  authMiddleware,
+  dealerMiddleware,
+  getDeviceSaleById
+);
+
+router.post(
+  "/loans",
+  authMiddleware,
+  dealerMiddleware,
+  createLoan
+);
 
 export default router;

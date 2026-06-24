@@ -151,3 +151,31 @@ export type UpdateDealerInput =
 
 export type UpdateCustomerInput =
   z.infer<typeof UpdateCustomerSchema>;
+
+                     // DEVICE SALE
+
+  export const CreateDeviceSaleSchema = z.object({
+  customerId: z.string().uuid(),
+
+  brand: z.string().min(1, "Brand is required"),
+
+  model: z.string().min(1, "Model is required"),
+
+  imei: z.string().min(10, "IMEI is required"),
+
+  salePrice: z.number().positive(),
+
+  purchaseDate: z.string().optional(),
+});
+
+export const CreateLoanSchema = z.object({
+  customerId: z.string().uuid(),
+
+  deviceSaleId: z.string().uuid(),
+
+  totalAmount: z.number().positive(),
+
+  downPayment: z.number().min(0),
+
+  tenureMonths: z.number().min(1),
+});
