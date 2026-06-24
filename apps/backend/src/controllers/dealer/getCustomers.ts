@@ -18,30 +18,54 @@ export const getCustomers = async (
       });
     }
 
-    const customers = await prisma.customer.findMany({
-      where: {
-        dealerId: dealer.id,
-      },
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            isActive: true,
+    const skip = (page - 1) * limit;
+
+    const [customers, totalCustomers] = await Promise.all([
+      prisma.customer.findMany({
+        where: {
+          dealerId: dealer.id,
+        },
+
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              isActive: true,
+            },
           },
         },
-      },
 
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        orderBy: {
+          createdAt: "desc",
+        },
+
+        skip,
+        take: limit,
+      }),
+
+      prisma.customer.count({
+        where: {
+          dealerId: dealer.id,
+        },
+      }),
+    ]);
 
     return res.status(200).json({
-      totalCustomers: customers.length,
-      customers,
+      data: customers,
+
+      pagination: {
+        page,
+        limit,
+        totalCustomers,
+        totalPages: Math.ceil(
+          totalCustomers / limit
+        ),
+      },
     });
   } catch (error) {
     console.error(error);

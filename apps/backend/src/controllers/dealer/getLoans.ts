@@ -18,38 +18,60 @@ export const getLoans = async (
       });
     }
 
-    const loans = await prisma.loan.findMany({
-      where: {
-        customer: {
-          dealerId: dealer.id,
-        },
-      },
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-      include: {
-        customer: {
-          select: {
-            customerName: true,
-            phone: true,
+    const skip = (page - 1) * limit;
+
+    const where = {
+      customer: {
+        dealerId: dealer.id,
+      },
+    };
+
+    const [loans, total] = await Promise.all([
+      prisma.loan.findMany({
+        where,
+
+        include: {
+          customer: {
+            select: {
+              customerName: true,
+              phone: true,
+            },
+          },
+
+          deviceSale: {
+            select: {
+              brand: true,
+              model: true,
+              imei: true,
+            },
           },
         },
 
-        deviceSale: {
-          select: {
-            brand: true,
-            model: true,
-            imei: true,
-          },
+        orderBy: {
+          createdAt: "desc",
         },
-      },
 
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+        skip,
+        take: limit,
+      }),
+
+      prisma.loan.count({
+        where,
+      }),
+    ]);
 
     return res.status(200).json({
-      total: loans.length,
-      loans,
+      data: loans,
+
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error(error);
