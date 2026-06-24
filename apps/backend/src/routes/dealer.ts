@@ -9,6 +9,11 @@ import { getDeviceSales } from "../controllers/dealer/getDeviceSales";
 import { getDeviceSaleById } from "../controllers/dealer/getDeviceSaleById";
 
 import { createLoan } from "../controllers/dealer/createLoan";
+import { getLoans } from "../controllers/dealer/getLoans";
+import { getLoanById } from "../controllers/dealer/getLoanById";
+
+import { getEmis } from "../controllers/dealer/getEmis";
+import { payEmi } from "../controllers/dealer/payEmi";
 
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { dealerMiddleware } from "../middlewares/dealerMiddleware";
@@ -86,6 +91,34 @@ router.post(
   authMiddleware,
   dealerMiddleware,
   createLoan
+);
+
+router.get(
+  "/loans",
+  authMiddleware,
+  dealerMiddleware,
+  getLoans
+);
+
+router.get(
+  "/loans/:id",
+  authMiddleware,
+  dealerMiddleware,
+  getLoanById
+);
+
+router.get(
+  "/emis",
+  authMiddleware,
+  dealerMiddleware,
+  getEmis
+);
+
+router.post(
+  "/emis/:id/pay",
+  authMiddleware,
+  dealerMiddleware,
+  payEmi
 );
 
 export default router;

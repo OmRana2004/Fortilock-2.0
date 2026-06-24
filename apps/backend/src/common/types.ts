@@ -168,6 +168,8 @@ export type UpdateCustomerInput =
   purchaseDate: z.string().optional(),
 });
 
+            // CREATING LOAN
+
 export const CreateLoanSchema = z.object({
   customerId: z.string().uuid(),
 
@@ -178,4 +180,10 @@ export const CreateLoanSchema = z.object({
   downPayment: z.number().min(0),
 
   tenureMonths: z.number().min(1),
+});
+
+                  // PAY EMIs
+
+export const PayEmiSchema = z.object({
+  amount: z.number().positive(),
 });

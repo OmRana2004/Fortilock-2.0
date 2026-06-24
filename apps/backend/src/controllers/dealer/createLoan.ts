@@ -69,27 +69,52 @@ export const createLoan = async (
       financedAmount / tenureMonths;
 
     const loan = await prisma.loan.create({
-      data: {
-        customerId,
-        deviceSaleId,
+  data: {
+    customerId,
+    deviceSaleId,
 
-        totalAmount,
-        downPayment,
+    totalAmount,
+    downPayment,
 
-        financedAmount,
+    financedAmount,
 
-        tenureMonths,
+    tenureMonths,
 
-        monthlyEmi,
+    monthlyEmi,
 
-        startDate: new Date(),
-      },
-    });
+    startDate: new Date(),
+  },
+});
+
+const emis = [];
+
+for (let i = 1; i <= tenureMonths; i++) {
+  const dueDate = new Date();
+
+  dueDate.setMonth(
+    dueDate.getMonth() + i
+  );
+
+  emis.push({
+    loanId: loan.id,
+
+    installmentNumber: i,
+
+    dueDate,
+
+    amount: monthlyEmi,
+  });
+}
+
+await prisma.emi.createMany({
+  data: emis,
+});
 
     return res.status(201).json({
-      message: "Loan created successfully",
-      loan,
-    });
+  message: "Loan created successfully",
+  loan,
+  totalEmisCreated: tenureMonths,
+});
   } catch (error) {
     console.error(error);
 
