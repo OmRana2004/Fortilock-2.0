@@ -1,4 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
+import type {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -13,25 +17,18 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.token;
 
-    if (!authHeader) {
+    if (!token) {
       return res.status(401).json({
-        message: "Authorization header missing",
+        message: "Unauthorized",
       });
     }
 
-   const token = authHeader.startsWith("Bearer ")
-  ? authHeader.split(" ")[1]
-  : authHeader;
-
-if (!token) {
-  return res.status(401).json({
-    message: "Token missing",
-  });
-}
-
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(
+      token,
+      JWT_SECRET
+    ) as {
       userId: string;
       role: string;
     };

@@ -6,12 +6,11 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "ADMIN" | "DEALER" | "CUSTOMER";
+  role: "SUPER_ADMIN" | "DEALER" | "CUSTOMER";
 }
 
 interface AuthStore {
   user: User | null;
-  token: string | null;
   loading: boolean;
   error: string | null;
 
@@ -20,7 +19,9 @@ interface AuthStore {
     password: string
   ) => Promise<User | null>;
 
-  logout: () => void;
+  logout: () => Promise<void>;
+
+  restoreSession: () => Promise<boolean>;
 }
 
 export const useAuthStore =
@@ -28,7 +29,6 @@ export const useAuthStore =
     persist(
       (set) => ({
         user: null,
-        token: null,
         loading: false,
         error: null,
 
@@ -51,14 +51,11 @@ export const useAuthStore =
                 }
               );
 
-            const {
-              token,
-              user,
-            } = response.data;
+            const { user } =
+              response.data;
 
             set({
               user,
-              token,
               loading: false,
             });
 
@@ -76,13 +73,41 @@ export const useAuthStore =
           }
         },
 
-        logout: () => {
+        logout: async () => {
+          try {
+            await api.post(
+              "/api/v1/auth/logout"
+            );
+          } catch {}
+
           set({
             user: null,
-            token: null,
             error: null,
           });
         },
+
+        restoreSession: async () => {
+  try {
+    set({ loading: true });
+
+    const response =
+      await api.get("/api/v1/auth/me");
+
+    set({
+      user: response.data,
+      loading: false,
+    });
+
+    return true;
+  } catch {
+    set({
+      user: null,
+      loading: false,
+    });
+
+    return false;
+  }
+}
       }),
       {
         name: "fortilock-auth",

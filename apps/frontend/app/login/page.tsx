@@ -29,9 +29,19 @@ export default function LoginPage() {
       password
     );
 
-    if (success) {
-      router.push("/admin/dashboard");
-    }
+    if (!success) return;
+
+if (success.role === "SUPER_ADMIN") {
+  router.push("/admin/dashboard");
+}
+
+if (success.role === "DEALER") {
+  router.push("/dealer/dashboard");
+}
+
+if (success.role === "CUSTOMER") {
+  router.push("/customer/dashboard");
+}
   };
 
   return (
