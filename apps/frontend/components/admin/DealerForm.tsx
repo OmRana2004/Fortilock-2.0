@@ -5,6 +5,19 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { api } from "@/lib/axios";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import {
   ArrowLeft,
   Building2,
@@ -19,6 +32,7 @@ import {
   Eye,
   EyeOff,
   Save,
+  Loader2,
 } from "lucide-react";
 
 interface DealerFormData {
@@ -51,53 +65,91 @@ const initialData: DealerFormData = {
   gstNumber: "",
 };
 
+function SectionBox({
+  icon,
+  iconBg,
+  iconColor,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  iconColor: string;
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.3 }}
+      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
+      {/* Section Header */}
+      <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-4">
+        <div className={`rounded-xl ${iconBg} p-2.5`}>
+          <span className={iconColor}>{icon}</span>
+        </div>
+        <div>
+          <h2 className="font-semibold text-slate-800">{title}</h2>
+          <p className="text-xs text-slate-500">{description}</p>
+        </div>
+      </div>
+
+      {/* Grid Table Body */}
+      <div className="divide-y divide-slate-100">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
+function FieldRow({ children, cols = 2 }: { children: React.ReactNode; cols?: number }) {
+  return (
+    <div className={`grid divide-x divide-slate-100 ${cols === 2 ? "grid-cols-1 md:grid-cols-2" : cols === 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-1"}`}>
+      {children}
+    </div>
+  );
+}
+
+function FieldCell({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5 px-6 py-4">
+      <Label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        {label}
+      </Label>
+      {children}
+    </div>
+  );
+}
+
 export default function DealerForm() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
-
-  const [showPassword, setShowPassword] =
-    useState(false);
-
-  const [form, setForm] =
-    useState<DealerFormData>(initialData);
+  const [showPassword, setShowPassword] = useState(false);
+  const [form, setForm] = useState<DealerFormData>(initialData);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (
-    e: React.FormEvent
-  ) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       setLoading(true);
-
-      await api.post(
-        "/api/v1/admin/dealers",
-        {
-          ...form,
-          yearOfEstablishment:
-            Number(form.yearOfEstablishment),
-        }
-      );
-
+      await api.post("/api/v1/admin/dealers", {
+        ...form,
+        yearOfEstablishment: Number(form.yearOfEstablishment),
+      });
       alert("Dealer Created Successfully");
-
-      router.push("/admin/delears");
+      router.push("/admin/dealers");
     } catch (err: any) {
-      alert(
-        err?.response?.data?.message ??
-          "Something went wrong"
-      );
+      alert(err?.response?.data?.message ?? "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -105,430 +157,279 @@ export default function DealerForm() {
 
   return (
     <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.4,
-      }}
-      className="mx-auto max-w-7xl p-8"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="mx-auto max-w-5xl p-6 md:p-10"
     >
+      {/* Page Header */}
       <div className="mb-8 flex items-center justify-between">
-
         <div>
-
-          <h1 className="text-3xl font-bold">
-            Create Dealer
-          </h1>
-
-          <p className="mt-2 text-slate-500">
-            Register a new dealer account
+          <div className="mb-1 flex items-center gap-2">
+            <Badge variant="secondary" className="bg-violet-100 text-violet-600">
+              Admin
+            </Badge>
+            <span className="text-sm text-muted-foreground">/ Dealers / New</span>
+          </div>
+          <h1 className="text-3xl font-bold font-serif">Create Dealer</h1>
+          <p className="mt-1 text-muted-foreground">
+            Register a new dealer account and shop profile
           </p>
-
         </div>
 
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 hover:bg-slate-50"
-        >
-          <ArrowLeft size={18} />
+        <Button variant="outline" onClick={() => router.back()} className="gap-2">
+          <ArrowLeft size={16} />
           Back
-        </button>
+        </Button>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8"
-      >
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* ACCOUNT */}
-
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 20,
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-          }}
-          className="rounded-3xl border bg-white p-8 shadow-sm"
+        {/* Account Information */}
+        <SectionBox
+          icon={<User className="h-5 w-5" />}
+          iconBg="bg-violet-100"
+          iconColor="text-violet-600"
+          title="Account Information"
+          description="Login credentials for the dealer"
         >
-
-          <div className="mb-8 flex items-center gap-3">
-
-            <div className="rounded-xl bg-violet-100 p-3">
-
-              <User className="text-violet-600" />
-
-            </div>
-
-            <div>
-
-              <h2 className="text-xl font-bold">
-                Account Information
-              </h2>
-
-              <p className="text-sm text-slate-500">
-                Login credentials
-              </p>
-
-            </div>
-
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-
-            <div>
-
-              <label className="mb-2 block text-sm font-medium">
-                Contact Person
-              </label>
-
+          <FieldRow cols={2}>
+            <FieldCell label="Contact Person">
               <div className="relative">
-
-                <User className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="contactPerson"
+                  placeholder="Full name"
                   value={form.contactPerson}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9"
                 />
-
               </div>
+            </FieldCell>
 
-            </div>
-
-            <div>
-
-              <label className="mb-2 block text-sm font-medium">
-                Email
-              </label>
-
+            <FieldCell label="Email">
               <div className="relative">
-
-                <Mail className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   type="email"
                   name="email"
-                  required
+                  placeholder="dealer@example.com"
                   value={form.email}
                   onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:border-violet-500"
-                />
-
-              </div>
-
-            </div>
-
-            <div>
-
-              <label className="mb-2 block text-sm font-medium">
-                Password
-              </label>
-
-              <div className="relative">
-
-                <Lock className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="password"
-                  value={form.password}
                   required
-                  onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-12 outline-none focus:border-violet-500"
+                  className="pl-9"
                 />
+              </div>
+            </FieldCell>
+          </FieldRow>
 
+          <FieldRow cols={2}>
+            <FieldCell label="Password">
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Min. 8 characters"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  className="pl-9 pr-10"
+                />
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(
-                      !showPassword
-                    )
-                  }
-                  className="absolute right-4 top-4"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                 >
-                  {showPassword ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-
               </div>
+            </FieldCell>
 
-            </div>
-
-            <div>
-
-              <label className="mb-2 block text-sm font-medium">
-                Phone
-              </label>
-
+            <FieldCell label="Phone">
               <div className="relative">
-
-                <Phone className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="phone"
+                  placeholder="+91 00000 00000"
                   value={form.phone}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none focus:border-violet-500"
+                  className="pl-9"
                 />
-
               </div>
+            </FieldCell>
+          </FieldRow>
+        </SectionBox>
 
-            </div>
-
-          </div>
-
-        </motion.div>
-
-                {/* SHOP INFORMATION */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="rounded-3xl border bg-white p-8 shadow-sm"
+        {/* Shop Information */}
+        <SectionBox
+          icon={<Building2 className="h-5 w-5" />}
+          iconBg="bg-blue-100"
+          iconColor="text-blue-600"
+          title="Shop Information"
+          description="Dealer business and personal details"
         >
-          <div className="mb-8 flex items-center gap-3">
-            <div className="rounded-xl bg-blue-100 p-3">
-              <Building2 className="text-blue-600" />
-            </div>
-
-            <div>
-              <h2 className="text-xl font-bold">
-                Shop Information
-              </h2>
-
-              <p className="text-sm text-slate-500">
-                Dealer business details
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Shop Name
-              </label>
-
+          <FieldRow cols={2}>
+            <FieldCell label="Shop Name">
               <div className="relative">
-                <Building2 className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="shopName"
+                  placeholder="Shop or business name"
                   value={form.shopName}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9"
                 />
               </div>
-            </div>
+            </FieldCell>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Gender
-              </label>
-
-              <select
-                name="gender"
+            <FieldCell label="Gender">
+              <Select
                 value={form.gender}
-                onChange={handleChange}
+                onValueChange={(val) => setForm({ ...form, gender: val })}
                 required
-                className="w-full rounded-xl border px-4 py-3 outline-none focus:border-violet-500"
               >
-                <option value="">
-                  Select Gender
-                </option>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MALE">Male</SelectItem>
+                  <SelectItem value="FEMALE">Female</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </FieldCell>
+          </FieldRow>
 
-                <option value="MALE">
-                  Male
-                </option>
-
-                <option value="FEMALE">
-                  Female
-                </option>
-
-                <option value="OTHER">
-                  Other
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Date of Birth
-              </label>
-
+          <FieldRow cols={2}>
+            <FieldCell label="Date of Birth">
               <div className="relative">
-                <Calendar className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   type="date"
                   name="dateOfBirth"
                   value={form.dateOfBirth}
                   onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9"
                 />
               </div>
-            </div>
+            </FieldCell>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Year of Establishment
-              </label>
-
-              <input
+            <FieldCell label="Year of Establishment">
+              <Input
                 type="number"
                 name="yearOfEstablishment"
+                placeholder="e.g. 2010"
                 value={form.yearOfEstablishment}
                 onChange={handleChange}
                 required
-                className="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-violet-500"
+                min={1900}
+                max={new Date().getFullYear()}
               />
-            </div>
+            </FieldCell>
+          </FieldRow>
 
-            <div className="md:col-span-2">
-              <label className="mb-2 block text-sm font-medium">
-                Address
-              </label>
-
+          <FieldRow cols={1}>
+            <FieldCell label="Address">
               <div className="relative">
-                <MapPin className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <textarea
-                  rows={4}
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Textarea
                   name="address"
+                  rows={3}
+                  placeholder="Full business address"
                   value={form.address}
                   onChange={handleChange}
                   required
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="resize-none pl-9"
                 />
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </FieldCell>
+          </FieldRow>
+        </SectionBox>
 
-        {/* GOVERNMENT DETAILS */}
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="rounded-3xl border bg-white p-8 shadow-sm"
+        {/* Government Details */}
+        <SectionBox
+          icon={<Landmark className="h-5 w-5" />}
+          iconBg="bg-emerald-100"
+          iconColor="text-emerald-600"
+          title="Government Details"
+          description="Identity and tax information"
         >
-          <div className="mb-8 flex items-center gap-3">
-            <div className="rounded-xl bg-green-100 p-3">
-              <Landmark className="text-green-600" />
-            </div>
-
-            <div>
-              <h2 className="text-xl font-bold">
-                Government Details
-              </h2>
-
-              <p className="text-sm text-slate-500">
-                Identity & Tax information
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Aadhar Number
-              </label>
-
+          <FieldRow cols={3}>
+            <FieldCell label="Aadhar Number">
               <div className="relative">
-                <FileText className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="aadharNumber"
+                  placeholder="XXXX XXXX XXXX"
                   value={form.aadharNumber}
                   onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9"
                 />
               </div>
-            </div>
+            </FieldCell>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                PAN Number
-              </label>
-
+            <FieldCell label="PAN Number">
               <div className="relative">
-                <FileText className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="panNumber"
+                  placeholder="ABCDE1234F"
                   value={form.panNumber}
                   onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9 uppercase"
                 />
               </div>
-            </div>
+            </FieldCell>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                GST Number
-              </label>
-
+            <FieldCell label="GST Number">
               <div className="relative">
-                <FileText className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
-
-                <input
+                <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
                   name="gstNumber"
+                  placeholder="22ABCDE1234F1Z5"
                   value={form.gstNumber}
                   onChange={handleChange}
-                  className="w-full rounded-xl border py-3 pl-12 pr-4 outline-none transition focus:border-violet-500"
+                  className="pl-9 uppercase"
                 />
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </FieldCell>
+          </FieldRow>
+        </SectionBox>
 
-        {/* BUTTONS */}
-
-        <div className="flex justify-end gap-4">
-          <button
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <Button
             type="button"
+            variant="outline"
             onClick={() => router.back()}
-            className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-medium transition hover:bg-slate-100"
+            disabled={loading}
           >
             Cancel
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-xl bg-violet-600 px-8 py-3 font-medium text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-w-36 gap-2 bg-violet-600 text-white hover:bg-violet-700"
           >
-            <Save size={18} />
-
-            {loading
-              ? "Creating..."
-              : "Create Dealer"}
-          </button>
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Creating...
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                Create Dealer
+              </>
+            )}
+          </Button>
         </div>
+
       </form>
     </motion.div>
   );
