@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
+import { Spinner } from "@/components/ui/spinner";
 
 type Role =
   | "SUPER_ADMIN"
@@ -63,7 +64,9 @@ export default function ProtectedRoute({
   }, []);
 
   if (checking) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center gap-6 justify-center min-h-screen">
+        <Spinner className="size-8" />
+    </div>;
   }
 
   return <>{children}</>;
