@@ -3,7 +3,7 @@
 
 import DashboardStats from "@/components/admin/dashboard-stats";
 import DealerTable from "@/components/admin/dealer-table";
-import { div } from "framer-motion/client";
+import DealerForm from "@/components/admin/DealerForm";
 
 export default function DealersPage() {
   return (
@@ -12,6 +12,7 @@ export default function DealersPage() {
 <div className="">
 <DealerTable />
 </div>
+<DealerForm />
          </div> 
   )
 }
