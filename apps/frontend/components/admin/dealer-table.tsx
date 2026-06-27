@@ -1,16 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/axios";
-import { 
-  Search, 
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Search, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Dealer {
   id: string;
@@ -29,8 +35,6 @@ interface Pagination {
   total: number;
   totalPages: number;
 }
-
-
 
 export default function DealerTable() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
@@ -68,17 +72,37 @@ export default function DealerTable() {
       await api.patch(`/api/v1/admin/dealers/${dealer.id}/toggle-status`);
       setDealers((prev) =>
         prev.map((d) =>
-          d.id === dealer.id ? { ...d, isActive: !d.isActive } : d
-        )
+          d.id === dealer.id ? { ...d, isActive: !d.isActive } : d,
+        ),
       );
     } catch (error) {
       console.error(error);
     }
   };
 
+  // delete
+  const handleDelete = async (dealer: Dealer) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${dealer.shopName}"?`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/api/v1/admin/dealers/${dealer.id}`);
+
+      // Refresh list
+      fetchDealers();
+
+      // OR update local state (see below)
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete dealer");
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm p-6 space-y-6">
-
       {/* Header */}
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>
@@ -93,13 +117,18 @@ export default function DealerTable() {
           <input
             placeholder="Search"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm outline-none transition-all focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="w-full rounded-b-sm border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm outline-none transition-all focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl px-5 py-2.5 text-sm transition shadow-sm active:scale-95"
+          <Button
+            variant="outline"
+            className="bg-violet-600 text-white px-2 py-2 font-extrabold transition shadow-sm active:scale-95 cursor-pointer"
           >
             + Add Dealer
           </Button>
@@ -107,12 +136,15 @@ export default function DealerTable() {
       </div>
 
       {/* Table Container */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 shadow-xs">
+      <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold uppercase tracking-wide text-slate-500">
               <th className="w-12 px-4 py-3 text-center">
-                <input type="checkbox" className="rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
+                />
               </th>
               <th className="px-6 py-3 text-left">Dealer ID</th>
               <th className="px-6 py-3 text-left">Dealer Name</th>
@@ -135,48 +167,70 @@ export default function DealerTable() {
               ))
             ) : dealers.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-16 text-center text-slate-400">
+                <td
+                  colSpan={6}
+                  className="px-6 py-16 text-center text-slate-400"
+                >
                   <p className="text-base font-medium">No dealers found</p>
-                  <p className="mt-1 text-sm">Try adjusting your search query.</p>
+                  <p className="mt-1 text-sm">
+                    Try adjusting your search query.
+                  </p>
                 </td>
               </tr>
             ) : (
               dealers.map((dealer) => (
-                <tr key={dealer.id} className="group transition-colors hover:bg-slate-50/40">
+                <tr
+                  key={dealer.id}
+                  className="group transition-colors hover:bg-slate-50/40"
+                >
                   <td className="px-4 py-4 text-center">
-                    <input type="checkbox" className="rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
+                    <input
+                      type="checkbox"
+                      className="rounded border-slate-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
+                    />
                   </td>
 
                   <td className="px-6 py-4 font-medium text-blue-600 hover:underline cursor-pointer">
                     {`DL${dealer.id.slice(0, 6).toUpperCase()}`}
                   </td>
 
-                  <td className="px-6 py-4 font-medium text-slate-600 capitalize">{dealer.shopName}</td>
-                  <td className="px-6 py-4 text-slate-600">{dealer.contactPerson}</td>
+                  <td className="px-6 py-4 font-medium text-slate-600 capitalize">
+                    {dealer.shopName}
+                  </td>
+                  <td className="px-6 py-4 text-slate-600">
+                    {dealer.contactPerson}
+                  </td>
                   <td className="px-6 py-4 text-slate-500">{dealer.phone}</td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition shadow-xs">
-                        <span className="block h-4 w-4 leading-none text-center text-xs">📝</span>
+                      <button className="p-2 cursor-pointer hover:bg-accent transition shadow-accent">
+                        <span className="block h-6 w-6 leading-none text-center text-xl">
+                          📝
+                        </span>
                       </button>
-                     
-                      <button className="p-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 transition shadow-xs">
+
+                      <button
+                        onClick={() => handleDelete(dealer)}
+                        className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition cursor-pointer"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
 
-                      <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 rounded-lg p-1 ml-1">
-                        <Badge className={`shadow-none font-semibold rounded px-2.5 py-0.5 border-none transition-colors ${
-                          dealer.isActive 
-                            ? "bg-emerald-600 hover:bg-emerald-600 text-white" 
-                            : "bg-slate-300 hover:bg-slate-300 text-slate-600"
-                        }`}>
+                      <div className="flex items-center gap-1 bg-slate-50 border border-slate-100 rounded-lg p-1 ml-1">
+                        <Badge
+                          className={`shadow-none font-bold rounded px-2.5 py-0.5 border-none transition-colors ${
+                            dealer.isActive
+                              ? " bg-emerald-600 hover:bg-emerald-600 text-amber-50"
+                              : "bg-slate-300 hover:bg-slate-300 text-slate-600"
+                          }`}
+                        >
                           {dealer.isActive ? "ACTIVE" : "INACTIVE"}
                         </Badge>
-                        <Switch 
-                          checked={dealer.isActive} 
+                        <Switch
+                          checked={dealer.isActive}
                           onCheckedChange={() => toggleStatus(dealer)}
-                          className="data-[state=checked]:bg-emerald-500 scale-90"
+                          className="data-[state=checked]:bg-emerald-500 scale-100 cursor-pointer"
                         />
                       </div>
                     </div>
@@ -191,36 +245,38 @@ export default function DealerTable() {
       {/* Pagination Footer */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-sm text-slate-500">
         <div>
-          Showing {dealers.length === 0 ? 0 : (page - 1) * 10 + 1} to {Math.min(page * 10, pagination.total)} of {pagination.total} entries
+          Showing {dealers.length === 0 ? 0 : (page - 1) * 10 + 1} to{" "}
+          {Math.min(page * 10, pagination.total)} of {pagination.total} entries
         </div>
-        
+
         <div className="flex items-center gap-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 rounded-md text-slate-400" 
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-md text-slate-400"
             disabled={page === 1}
-            onClick={() => setPage(p => Math.max(p - 1, 1))}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           <Button className="h-8 w-8 bg-black hover:bg-black text-white font-semibold rounded-md text-xs">
             {page}
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8 rounded-md text-slate-400" 
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-md text-slate-400"
             disabled={page >= pagination.totalPages}
-            onClick={() => setPage(p => Math.min(p + 1, pagination.totalPages))}
+            onClick={() =>
+              setPage((p) => Math.min(p + 1, pagination.totalPages))
+            }
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
-
     </div>
   );
 }
