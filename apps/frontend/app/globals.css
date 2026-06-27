@@ -2,7 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
 
 :root {
 
@@ -184,7 +183,6 @@ html {
 }
 
 body {
-  font-family: var(--font-geist-sans), sans-serif;
   min-height: 100vh;
 }
 

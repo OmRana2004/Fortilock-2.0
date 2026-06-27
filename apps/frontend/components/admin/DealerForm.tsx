@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { api } from "@/lib/axios";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/select";
 
 import {
-  ArrowLeft,
   Building2,
   User,
   Mail,
@@ -31,13 +29,29 @@ import {
   FileText,
   Eye,
   EyeOff,
-  Save,
-  Loader2,
 } from "lucide-react";
 
 interface DealerFormProps {
+  dealer?: Dealer | null;
   onSuccess?: () => void;
   onCancel?: () => void;
+}
+
+interface Dealer {
+  id: string;
+  shopName: string;
+  contactPerson: string;
+  phone: string;
+  address?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  yearOfEstablishment?: number;
+  aadharNumber?: string;
+  panNumber?: string;
+  gstNumber?: string;
+  user: {
+    email: string;
+  };
 }
 
 
@@ -71,6 +85,7 @@ const initialData: DealerFormData = {
   panNumber: "",
   gstNumber: "",
 };
+
 
 function SectionBox({
   icon,
@@ -134,6 +149,7 @@ function FieldCell({ label, children }: { label: string; children: React.ReactNo
 }
 
 export default function DealerForm({
+  dealer,
   onSuccess,
   onCancel,
 }: DealerFormProps) {
@@ -141,6 +157,27 @@ export default function DealerForm({
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState<DealerFormData>(initialData);
+
+  useEffect(() => {
+    if (dealer) {
+      setForm({
+        shopName: dealer.shopName,
+        contactPerson: dealer.contactPerson,
+        email: dealer.user.email,
+        password: "",
+        phone: dealer.phone,
+        gender: dealer.gender ?? "",
+        dateOfBirth: dealer.dateOfBirth ?? "",
+        yearOfEstablishment: dealer.yearOfEstablishment?.toString() ?? "",
+        address: dealer.address ?? "",
+        aadharNumber: dealer.aadharNumber ?? "",
+        panNumber: dealer.panNumber ?? "",
+        gstNumber: dealer.gstNumber ?? "",
+      });
+    } else {
+      setForm(initialData);
+    }
+  }, [dealer]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -152,10 +189,17 @@ export default function DealerForm({
     e.preventDefault();
     try {
       setLoading(true);
-      await api.post("/api/v1/admin/dealers", {
-  ...form,
-  yearOfEstablishment: Number(form.yearOfEstablishment),
-});
+     if (dealer) {
+    await api.put(`/api/v1/admin/dealers/${dealer.id}`, {
+        ...form,
+        yearOfEstablishment: Number(form.yearOfEstablishment),
+    });
+} else {
+    await api.post("/api/v1/admin/dealers", {
+        ...form,
+        yearOfEstablishment: Number(form.yearOfEstablishment),
+    });
+}
 
 setForm(initialData);
 
@@ -235,15 +279,17 @@ if (onSuccess) {
             <FieldCell label="Password">
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Min. 8 characters"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  className="pl-9 pr-10"
-                />
+               <Input
+  type={showPassword ? "text" : "password"}
+  name="password"
+  className="pl-9"
+  value={form.password}
+  onChange={handleChange}
+  required={!dealer}
+  placeholder={
+       "Minimum 8 characters"
+  }
+/>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -426,13 +472,14 @@ if (onSuccess) {
 </Button>
 
 
-          <Button
-  type="submit"
-  disabled={loading}
-  className="min-w bg-violet-600 text-white hover:bg-violet-700 cursor-pointer"
->
-  {!loading && <Save size={16} className="inline" />}
-  {loading ? "Creating..." : "Create Dealer"}
+          <Button type="submit">
+    {loading
+        ? dealer
+            ? "Updating..."
+            : "Creating..."
+        : dealer
+            ? "Update Dealer"
+            : "Create Dealer"}
 </Button>
 
         </div>

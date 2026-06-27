@@ -6,12 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/axios";
 import { Search, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import {Sheet, SheetContent} from "@/components/ui/sheet";
 
 import DealerForm from "./DealerForm";
 
@@ -24,6 +19,7 @@ interface Dealer {
   isActive: boolean;
   createdAt: string;
   user: { email: string };
+  
 }
 
 interface Pagination {
@@ -37,6 +33,7 @@ export default function DealerTable() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState<Pagination>({
@@ -125,34 +122,37 @@ export default function DealerTable() {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button
-  onClick={() => setOpen(true)}
-  className="bg-violet-600 hover:bg-violet-700 text-white px-4"
+   onClick={() => {
+    setSelectedDealer(null);
+    setOpen(true);
+  }}
+  className="bg-violet-500 hover:bg-violet-700 text-white px-2 cursor-pointer"
 >
-  + Add Dealer
+  Add Dealer
 </Button>
         </div>
       </div>
 
       {/* Table Container */}
-      <div className="overflow-x-auto rounded-xl border border-slate-100 shadow-xs">
+      <div className="overflow-x-auto rounded-lg border border-slate-100 shadow-xs">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <tr className="border-b border-slate-100 bg-gray-100 text-xs font-semibold uppercase tracking-wide text-slate-500">
               <th className="w-12 px-4 py-3 text-center">
                 <input
                   type="checkbox"
                   className="rounded border-slate-300 text-violet-600 focus:ring-violet-500 cursor-pointer"
                 />
               </th>
-              <th className="px-6 py-3 text-left">Dealer ID</th>
-              <th className="px-6 py-3 text-left">Dealer Name</th>
-              <th className="px-6 py-3 text-left">Contact Person</th>
-              <th className="px-6 py-3 text-left">Mobile Number</th>
-              <th className="px-6 py-3 text-center w-52">Action</th>
+              <th className="px-6 py-3 text-left text-black text-sm">Dealer ID</th>
+              <th className="px-6 py-3 text-left text-black text-sm">Dealer Name</th>
+              <th className="px-6 py-3 text-left text-black text-sm">Contact Person</th>
+              <th className="px-6 py-3 text-left text-black text-sm">Mobile Number</th>
+              <th className="px-6 py-3 text-center w-52 text-black text-sm">Action</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="bg-white">
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
@@ -188,17 +188,25 @@ export default function DealerTable() {
                     />
                   </td>
 
-                  <td className="px-6 py-4 font-medium text-blue-600 hover:underline cursor-pointer">
-                    {`DL${dealer.id.slice(0, 6).toUpperCase()}`}
-                  </td>
+                 <td className="px-6 py-4">
+  <button
+    onClick={() => {
+      setSelectedDealer(dealer);
+      setOpen(true);
+    }}
+    className="font-medium text-blue-600 hover:underline cursor-pointer"
+  >
+    {`DL${dealer.id.slice(0, 6).toUpperCase()}`}
+  </button>
+</td>
 
                   <td className="px-6 py-4 font-medium text-slate-600 capitalize">
                     {dealer.shopName}
                   </td>
-                  <td className="px-6 py-4 text-slate-600">
+                  <td className="px-14 py-4 text-left font-medium text-slate-600 capitalize">
                     {dealer.contactPerson}
                   </td>
-                  <td className="px-6 py-4 text-slate-500">{dealer.phone}</td>
+                  <td className="px-8 py-4 text-slate-500 font-medium">{dealer.phone}</td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
@@ -281,13 +289,18 @@ export default function DealerTable() {
     fullScreen
     className="overflow-y-auto p-0"
   >
-    <DealerForm
-      onSuccess={() => {
+   <DealerForm
+    dealer={selectedDealer}
+    onSuccess={() => {
         setOpen(false);
+        setSelectedDealer(null);
         fetchDealers();
-      }}
-      onCancel={() => setOpen(false)}
-    />
+    }}
+    onCancel={() => {
+        setOpen(false);
+        setSelectedDealer(null);
+    }}
+/>
   </SheetContent>
 </Sheet>
     </div>
