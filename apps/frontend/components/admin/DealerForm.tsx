@@ -35,6 +35,12 @@ import {
   Loader2,
 } from "lucide-react";
 
+interface DealerFormProps {
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+
 interface DealerFormData {
   shopName: string;
   contactPerson: string;
@@ -49,6 +55,7 @@ interface DealerFormData {
   panNumber: string;
   gstNumber: string;
 }
+
 
 const initialData: DealerFormData = {
   shopName: "",
@@ -126,7 +133,10 @@ function FieldCell({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-export default function DealerForm() {
+export default function DealerForm({
+  onSuccess,
+  onCancel,
+}: DealerFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -143,11 +153,17 @@ export default function DealerForm() {
     try {
       setLoading(true);
       await api.post("/api/v1/admin/dealers", {
-        ...form,
-        yearOfEstablishment: Number(form.yearOfEstablishment),
-      });
-      alert("Dealer Created Successfully");
-      router.push("/admin/dealers");
+  ...form,
+  yearOfEstablishment: Number(form.yearOfEstablishment),
+});
+
+setForm(initialData);
+
+if (onSuccess) {
+  onSuccess();
+} else {
+  router.push("/admin/dealers");
+}
     } catch (err: any) {
       alert(err?.response?.data?.message ?? "Something went wrong");
     } finally {
@@ -160,27 +176,18 @@ export default function DealerForm() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
-      className="mx-auto max-w-5xl p-6 md:p-10"
+      className="mx-auto max-w-7xl p-8"
     >
       {/* Page Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <div className="mb-1 flex items-center gap-2">
-            <Badge variant="secondary" className="bg-violet-100 text-violet-600">
-              Admin
-            </Badge>
-            <span className="text-sm text-muted-foreground">/ Dealers / New</span>
           </div>
           <h1 className="text-3xl font-bold font-serif">Create Dealer</h1>
           <p className="mt-1 text-muted-foreground">
             Register a new dealer account and shop profile
           </p>
         </div>
-
-        <Button variant="outline" onClick={() => router.back()} className="gap-2">
-          <ArrowLeft size={16} />
-          Back
-        </Button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -403,31 +410,31 @@ export default function DealerForm() {
         {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-2">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            disabled={loading}
-          >
-            Cancel
-          </Button>
+  type="button"
+  variant="outline"
+  onClick={() => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.back();
+    }
+  }}
+  disabled={loading}
+  className="border-slate-300 text-slate-600 hover:bg-slate-100 cursor-pointer"
+>
+  Cancel
+</Button>
+
 
           <Button
-            type="submit"
-            disabled={loading}
-            className="min-w-36 gap-2 bg-violet-600 text-white hover:bg-violet-700"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Creating...
-              </>
-            ) : (
-              <>
-                <Save size={16} />
-                Create Dealer
-              </>
-            )}
-          </Button>
+  type="submit"
+  disabled={loading}
+  className="min-w bg-violet-600 text-white hover:bg-violet-700 cursor-pointer"
+>
+  {!loading && <Save size={16} className="inline" />}
+  {loading ? "Creating..." : "Create Dealer"}
+</Button>
+
         </div>
 
       </form>

@@ -18,7 +18,7 @@ import { payEmi } from "../controllers/dealer/payEmi";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { dealerMiddleware } from "../middlewares/dealerMiddleware";
 import { deleteCustomer } from "../controllers/dealer/deleteCustomer";
-import { updateCustomer } from "../controllers/dealer/updateCustomer";
+// import { updateCustomer } from "../controllers/dealer/updateCustomer";
 import { getCustomerById } from "../controllers/dealer/getCustomerById";
 
 const router = Router();
@@ -51,12 +51,12 @@ router.get(
   getCustomerById
 );
 
-router.put(
-  "/customers/:id",
-  authMiddleware,
-  dealerMiddleware,
-  updateCustomer
-);
+// router.put(
+//   "/customers/:id",
+//   authMiddleware,
+//   dealerMiddleware,
+//   updateCustomer
+// );
 
 router.delete(
   "/customers/:id",

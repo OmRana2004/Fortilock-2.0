@@ -1,7 +1,7 @@
 
 
 import DealerTable from "@/components/admin/dealer-table";
-import DealerForm from "@/components/admin/DealerForm";
+
 
 
 export default function DealersPage() {
@@ -11,9 +11,7 @@ export default function DealersPage() {
 <DealerTable />
    </div>
 
-   <div>
-    <DealerForm />
-   </div>
+   
 
 
    </div>

@@ -1,22 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/axios";
 import { Search, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+
+import DealerForm from "./DealerForm";
 
 interface Dealer {
   id: string;
@@ -41,6 +38,7 @@ export default function DealerTable() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [open, setOpen] = useState(false);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 10,
@@ -127,11 +125,11 @@ export default function DealerTable() {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button
-            variant="outline"
-            className="bg-violet-600 text-white px-2 py-2 font-extrabold transition shadow-sm active:scale-95 cursor-pointer"
-          >
-            + Add Dealer
-          </Button>
+  onClick={() => setOpen(true)}
+  className="bg-violet-600 hover:bg-violet-700 text-white px-4"
+>
+  + Add Dealer
+</Button>
         </div>
       </div>
 
@@ -277,6 +275,22 @@ export default function DealerTable() {
           </Button>
         </div>
       </div>
+      <Sheet open={open} onOpenChange={setOpen}>
+  <SheetContent
+    side="right"
+    fullScreen
+    className="overflow-y-auto p-0"
+  >
+    <DealerForm
+      onSuccess={() => {
+        setOpen(false);
+        fetchDealers();
+      }}
+      onCancel={() => setOpen(false)}
+    />
+  </SheetContent>
+</Sheet>
     </div>
+    
   );
 }
