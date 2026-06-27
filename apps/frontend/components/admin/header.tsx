@@ -21,7 +21,7 @@ export default function Header({
       {/* Right */}
       <button className="overflow-hidden rounded-full ring-2 ring-slate-100 transition hover:ring-blue-100">
         <Image
-          src="/avatar.jpg"
+          src="/avatar.png"
           alt="Profile"
           width={48}
           height={48}

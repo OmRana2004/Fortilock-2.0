@@ -18,15 +18,25 @@ export const LoginSchema = z.object({
 export const CreateDealerSchema = z.object({
   shopName: z.string().min(2, "Shop name is required"),
 
-  contactPerson: z.string().min(2, "Contact person is required"),
+  contactPerson: z
+    .string()
+    .min(2, "Contact person is required"),
 
-  email: z.string().email("Valid email is required"),
+  email: z
+    .string()
+    .email("Valid email is required"),
 
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters"),
 
-  phone: z.string().length(10, "Phone must be 10 digits"),
+  phone: z
+    .string()
+    .length(10, "Phone must be 10 digits"),
 
-  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+  gender: z
+    .enum(["MALE", "FEMALE", "OTHER"])
+    .optional(),
 
   dateOfBirth: z.string().optional(),
 
@@ -40,6 +50,19 @@ export const CreateDealerSchema = z.object({
 
   gstNumber: z.string().optional(),
 });
+
+/* ================= UPDATE DEALER ================= */
+
+export const UpdateDealerSchema =
+  CreateDealerSchema.partial().extend({
+    password: z.union([
+      z.literal(""),
+      z.string().min(
+        6,
+        "Password must be at least 6 characters"
+      ),
+    ]),
+  });
 
 /* ================= CREATE CUSTOMER ================= */
 
@@ -90,51 +113,7 @@ export const CreateCustomerSchema = z.object({
     .optional(),
 });
 
-/* ================= UPDATE DEALER ================= */
 
-export const UpdateDealerSchema = z.object({
-  shopName: z
-    .string()
-    .trim()
-    .min(2, "Shop name must be at least 2 characters")
-    .optional(),
-
-  ownerName: z
-    .string()
-    .trim()
-    .min(2, "Owner name must be at least 2 characters")
-    .optional(),
-
-  phone: z
-    .string()
-    .regex(/^\d{10}$/, "Phone number must be exactly 10 digits")
-    .optional(),
-
-  address: z
-    .string()
-    .trim()
-    .optional(),
-});
-
-/* ================= UPDATE CUSTOMER ================= */
-
-export const UpdateCustomerSchema = z.object({
-  customerName: z.string().min(2).optional(),
-
-  phone: z.string().length(10).optional(),
-
-  address: z.string().optional(),
-
-  gender: z
-    .enum(["MALE", "FEMALE", "OTHER"])
-    .optional(),
-
-  bankName: z.string().optional(),
-
-  ifscCode: z.string().optional(),
-
-  accountNumber: z.string().optional(),
-});
 
 /* ================= TYPES ================= */
 
@@ -149,8 +128,8 @@ export type CreateCustomerInput =
 export type UpdateDealerInput =
   z.infer<typeof UpdateDealerSchema>;
 
-export type UpdateCustomerInput =
-  z.infer<typeof UpdateCustomerSchema>;
+// export type UpdateCustomerInput =
+//   z.infer<typeof UpdateCustomerSchema>;
 
                      // DEVICE SALE
 

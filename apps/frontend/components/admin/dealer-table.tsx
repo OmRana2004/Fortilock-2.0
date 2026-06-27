@@ -102,7 +102,7 @@ export default function DealerTable() {
   };
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm p-6 space-y-6">
+    <div className="overflow-hidden rounded-md border border-slate-200 bg-gray-50 shadow-sm p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
         <div>

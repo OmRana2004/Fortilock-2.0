@@ -3,6 +3,7 @@ import { Router } from "express";
 import { dashboard } from "../controllers/admin/dashboard";
 import { createDealer } from "../controllers/admin/createDealer";
 import { getDealers } from "../controllers/admin/getDealers";
+import { updateDealer } from "../controllers/admin/updateDealer";
 import { deleteDealer } from "../controllers/admin/deleteDealer";
 import { toggleDealerStatus } from "../controllers/admin/toggleDealerStatus";
 import { authMiddleware } from "../middlewares/authMiddleware";
@@ -29,6 +30,13 @@ router.get(
   authMiddleware,
   adminMiddleware,
   getDealers
+);
+
+router.put(
+  "/dealers/:id",
+  authMiddleware,
+  adminMiddleware,
+  updateDealer
 );
 
 router.delete(
