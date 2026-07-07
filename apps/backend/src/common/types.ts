@@ -3,14 +3,9 @@ import { z } from "zod";
 /* ================= LOGIN ================= */
 
 export const LoginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email("Please enter a valid email address"),
+  email: z.string().trim().email("Please enter a valid email address"),
 
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 /* ================= CREATE DEALER ================= */
@@ -18,25 +13,15 @@ export const LoginSchema = z.object({
 export const CreateDealerSchema = z.object({
   shopName: z.string().min(2, "Shop name is required"),
 
-  contactPerson: z
-    .string()
-    .min(2, "Contact person is required"),
+  contactPerson: z.string().min(2, "Contact person is required"),
 
-  email: z
-    .string()
-    .email("Valid email is required"),
+  email: z.string().email("Valid email is required"),
 
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 
-  phone: z
-    .string()
-    .length(10, "Phone must be 10 digits"),
+  phone: z.string().length(10, "Phone must be 10 digits"),
 
-  gender: z
-    .enum(["MALE", "FEMALE", "OTHER"])
-    .optional(),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
   dateOfBirth: z.string().optional(),
 
@@ -53,87 +38,66 @@ export const CreateDealerSchema = z.object({
 
 /* ================= UPDATE DEALER ================= */
 
-export const UpdateDealerSchema =
-  CreateDealerSchema.partial().extend({
-    password: z.union([
-      z.literal(""),
-      z.string().min(
-        6,
-        "Password must be at least 6 characters"
-      ),
-    ]),
-  });
+export const UpdateDealerSchema = CreateDealerSchema.partial().extend({
+  password: z.union([
+    z.literal(""),
+    z.string().min(6, "Password must be at least 6 characters"),
+  ]),
+});
 
 /* ================= CREATE CUSTOMER ================= */
 
 export const CreateCustomerSchema = z.object({
-  customerName: z
-    .string()
-    .trim()
-    .min(2, "Customer name is required"),
+  customerName: z.string().trim().min(2, "Customer name is required"),
 
-  email: z
-    .string()
-    .email("Valid email required"),
+  email: z.string().email("Valid email required"),
 
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 
-  phone: z
-    .string()
-    .regex(/^\d{10}$/),
+  phone: z.string().regex(/^\d{10}$/),
 
-  alternatePhone: z
-    .string()
-    .optional(),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
-  gender: z
-    .enum(["MALE", "FEMALE", "OTHER"])
-    .optional(),
+  dateOfBirth: z.string().optional(),
 
-  dateOfBirth: z
-    .string()
-    .optional(),
+  address: z.string().optional(),
 
-  address: z
-    .string()
-    .optional(),
+  aadharNumber: z.string().optional(),
 
-  bankName: z
-    .string()
-    .optional(),
+  panNumber: z.string().optional(),
 
-  ifscCode: z
-    .string()
-    .optional(),
+  bankName: z.string().optional(),
 
-  accountNumber: z
-    .string()
-    .optional(),
+  ifscCode: z.string().optional(),
+
+  accountNumber: z.string().optional(),
 });
 
+/* ================= UPDATE CUSTOMER ================= */
 
+export const UpdateCustomerSchema = CreateCustomerSchema.partial().extend({
+  password: z.union([
+    z.literal(""),
+    z.string().min(6, "Password must be at least 6 characters"),
+  ]),
+});
 
 /* ================= TYPES ================= */
 
 export type LoginInput = z.infer<typeof LoginSchema>;
 
-export type CreateDealerInput =
-  z.infer<typeof CreateDealerSchema>;
+export type CreateDealerInput = z.infer<typeof CreateDealerSchema>;
 
-export type CreateCustomerInput =
-  z.infer<typeof CreateCustomerSchema>;
+export type CreateCustomerInput = z.infer<typeof CreateCustomerSchema>;
 
-export type UpdateDealerInput =
-  z.infer<typeof UpdateDealerSchema>;
+export type UpdateDealerInput = z.infer<typeof UpdateDealerSchema>;
 
 // export type UpdateCustomerInput =
 //   z.infer<typeof UpdateCustomerSchema>;
 
-                     // DEVICE SALE
+// DEVICE SALE
 
-  export const CreateDeviceSaleSchema = z.object({
+export const CreateDeviceSaleSchema = z.object({
   customerId: z.string().uuid(),
 
   brand: z.string().min(1, "Brand is required"),
@@ -147,7 +111,7 @@ export type UpdateDealerInput =
   purchaseDate: z.string().optional(),
 });
 
-            // CREATING LOAN
+// CREATING LOAN
 
 export const CreateLoanSchema = z.object({
   customerId: z.string().uuid(),
@@ -161,7 +125,7 @@ export const CreateLoanSchema = z.object({
   tenureMonths: z.number().min(1),
 });
 
-                  // PAY EMIs
+// PAY EMIs
 
 export const PayEmiSchema = z.object({
   amount: z.number().positive(),

@@ -19,7 +19,7 @@ router.get(
 );
 
 router.post(
-  "/dealers",
+  "/dealer",
   authMiddleware,
   adminMiddleware,
   createDealer

@@ -110,6 +110,12 @@ model Customer {
 
   address String?
 
+  aadharCard   String?
+  aadharNumber String? @unique
+
+  panCard   String?
+  panNumber String? @unique
+
   bankName String?
   ifscCode String?
   accountNumber String?

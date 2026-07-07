@@ -31,59 +31,59 @@ import {
   EyeOff,
 } from "lucide-react";
 
-interface DealerFormProps {
-  dealer?: Dealer | null;
+interface CustomerFormProps {
+  customer?: Customer | null;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-interface Dealer {
+interface Customer {
   id: string;
-  shopName: string;
-  contactPerson: string;
+  customerName: string;
   phone: string;
   address?: string;
   gender?: string;
   dateOfBirth?: string;
-  yearOfEstablishment?: number;
   aadharNumber?: string;
   panNumber?: string;
-  gstNumber?: string;
+  bankName?: string;
+  ifscCode?: string;
+  accountNumber?: string;
   user: {
     email: string;
   };
 }
 
 
-interface DealerFormData {
-  shopName: string;
-  contactPerson: string;
+interface CustomerFormData {
+  customerName: string;
   email: string;
   password: string;
   phone: string;
   gender: string;
   dateOfBirth: string;
-  yearOfEstablishment: string;
   address: string;
   aadharNumber: string;
   panNumber: string;
-  gstNumber: string;
+  bankName: string;
+  ifscCode?: string;
+  accountNumber?: string;
 }
 
 
-const initialData: DealerFormData = {
-  shopName: "",
-  contactPerson: "",
+const initialData: CustomerFormData = {
+  customerName: "",
   email: "",
   password: "",
   phone: "",
   gender: "",
   dateOfBirth: "",
-  yearOfEstablishment: "",
   address: "",
   aadharNumber: "",
   panNumber: "",
-  gstNumber: "",
+  bankName: "",
+  ifscCode: "",
+  accountNumber: "",
 };
 
 
@@ -148,36 +148,36 @@ function FieldCell({ label, children }: { label: string; children: React.ReactNo
   );
 }
 
-export default function DealerForm({
-  dealer,
+export default function CustomerForm({
+  customer,
   onSuccess,
   onCancel,
-}: DealerFormProps) {
+}: CustomerFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState<DealerFormData>(initialData);
+  const [form, setForm] = useState<CustomerFormData>(initialData);
 
   useEffect(() => {
-    if (dealer) {
+    if (customer) {
       setForm({
-        shopName: dealer.shopName,
-        contactPerson: dealer.contactPerson,
-        email: dealer.user.email,
+        customerName: customer.customerName,
+        email: customer.user.email,
         password: "",
-        phone: dealer.phone,
-        gender: dealer.gender ?? "",
-        dateOfBirth: dealer.dateOfBirth ?? "",
-        yearOfEstablishment: dealer.yearOfEstablishment?.toString() ?? "",
-        address: dealer.address ?? "",
-        aadharNumber: dealer.aadharNumber ?? "",
-        panNumber: dealer.panNumber ?? "",
-        gstNumber: dealer.gstNumber ?? "",
+        phone: customer.phone,
+        gender: customer.gender ?? "",
+        dateOfBirth: customer.dateOfBirth ?? "",
+        address: customer.address ?? "",
+        aadharNumber: customer.aadharNumber ?? "",
+        panNumber: customer.panNumber ?? "",
+        bankName: customer.bankName ?? "",
+        ifscCode: customer.ifscCode ?? "",
+        accountNumber: customer.accountNumber ?? "",
       });
     } else {
       setForm(initialData);
     }
-  }, [dealer]);
+  }, [customer]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -189,15 +189,13 @@ export default function DealerForm({
     e.preventDefault();
     try {
       setLoading(true);
-     if (dealer) {
-    await api.put(`/api/v1/admin/dealers/${dealer.id}`, {
+     if (customer) {
+    await api.put(`/api/v1/dealer/customers/${customer.id}`, {
         ...form,
-        yearOfEstablishment: Number(form.yearOfEstablishment),
     });
 } else {
-    await api.post("/api/v1/admin/dealer", {
+    await api.post("/api/v1/dealer/customer", {
         ...form,
-        yearOfEstablishment: Number(form.yearOfEstablishment),
     });
 }
 
@@ -206,7 +204,7 @@ setForm(initialData);
 if (onSuccess) {
   onSuccess();
 } else {
-  router.push("/admin/dealers");
+  router.push("/dealer/customers");
 }
     } catch (err: any) {
       alert(err?.response?.data?.message ?? "Something went wrong");
@@ -227,9 +225,9 @@ if (onSuccess) {
         <div>
           <div className="mb-1 flex items-center gap-2">
           </div>
-          <h1 className="text-3xl font-bold font-serif">Create Dealer</h1>
+          <h1 className="text-3xl font-bold font-serif">Create Customer</h1>
           <p className="mt-1 text-muted-foreground">
-            Register a new dealer account and shop profile
+            Register a new customer account and profile
           </p>
         </div>
       </div>
@@ -245,19 +243,15 @@ if (onSuccess) {
           description="Login credentials for the dealer"
         >
           <FieldRow cols={2}>
-            <FieldCell label="Contact Person">
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  name="contactPerson"
-                  placeholder="Full name"
-                  value={form.contactPerson}
-                  onChange={handleChange}
-                  required
-                  className="pl-9"
-                />
-              </div>
-            </FieldCell>
+  <FieldCell label="Customer Name">
+    <Input
+      name="customerName"
+      value={form.customerName}
+      onChange={handleChange}
+      placeholder="Customer Name"
+      required
+    />
+  </FieldCell>
 
             <FieldCell label="Email">
               <div className="relative">
@@ -285,7 +279,7 @@ if (onSuccess) {
   className="pl-9"
   value={form.password}
   onChange={handleChange}
-  required={!dealer}
+  required={!customer} // Make password required only when creating a new customer
   placeholder={
        "Minimum 8 characters"
   }
@@ -316,29 +310,14 @@ if (onSuccess) {
           </FieldRow>
         </SectionBox>
 
-        {/* Shop Information */}
+        {/* Personal Information */}
         <SectionBox
-          icon={<Building2 className="h-5 w-5" />}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
-          title="Shop Information"
-          description="Dealer business and personal details"
-        >
-          <FieldRow cols={2}>
-            <FieldCell label="Shop Name">
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  name="shopName"
-                  placeholder="Shop or business name"
-                  value={form.shopName}
-                  onChange={handleChange}
-                  required
-                  className="pl-9"
-                />
-              </div>
-            </FieldCell>
-
+  icon={<User className="h-5 w-5" />}
+  iconBg="bg-blue-100"
+  iconColor="text-blue-600"
+  title="Personal Information"
+  description="Customer personal details"
+>
             <FieldCell label="Gender">
               <Select
                 value={form.gender}
@@ -355,7 +334,6 @@ if (onSuccess) {
                 </SelectContent>
               </Select>
             </FieldCell>
-          </FieldRow>
 
           <FieldRow cols={2}>
             <FieldCell label="Date of Birth">
@@ -371,18 +349,7 @@ if (onSuccess) {
               </div>
             </FieldCell>
 
-            <FieldCell label="Year of Establishment">
-              <Input
-                type="number"
-                name="yearOfEstablishment"
-                placeholder="e.g. 2010"
-                value={form.yearOfEstablishment}
-                onChange={handleChange}
-                required
-                min={1900}
-                max={new Date().getFullYear()}
-              />
-            </FieldCell>
+            
           </FieldRow>
 
           <FieldRow cols={1}>
@@ -437,20 +404,44 @@ if (onSuccess) {
                 />
               </div>
             </FieldCell>
-
-            <FieldCell label="GST Number">
-              <div className="relative">
-                <FileText className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Input
-                  name="gstNumber"
-                  placeholder="22ABCDE1234F1Z5"
-                  value={form.gstNumber}
-                  onChange={handleChange}
-                  className="pl-9 uppercase"
-                />
-              </div>
-            </FieldCell>
           </FieldRow>
+
+           <SectionBox
+  icon={<Landmark className="h-5 w-5" />}
+  iconBg="bg-green-100"
+  iconColor="text-green-600"
+  title="Bank Details"
+  description="Customer bank information"
+>
+           <FieldRow cols={2}>
+  <FieldCell label="Bank Name">
+    <Input
+      name="bankName"
+      value={form.bankName}
+      onChange={handleChange}
+    />
+  </FieldCell>
+
+  <FieldCell label="IFSC Code">
+    <Input
+      name="ifscCode"
+      value={form.ifscCode}
+      onChange={handleChange}
+    />
+  </FieldCell>
+</FieldRow>
+
+<FieldRow cols={1}>
+  <FieldCell label="Account Number">
+    <Input
+      name="accountNumber"
+      value={form.accountNumber}
+      onChange={handleChange}
+    />
+  </FieldCell>
+</FieldRow>
+</SectionBox>
+
         </SectionBox>
 
         {/* Action Buttons */}
@@ -474,12 +465,12 @@ if (onSuccess) {
 
           <Button type="submit">
     {loading
-        ? dealer
+        ? customer
             ? "Updating..."
             : "Creating..."
-        : dealer
-            ? "Update Dealer"
-            : "Create Dealer"}
+        : customer
+            ? "Update Customer"
+            : "Create Customer"}
 </Button>
 
         </div>

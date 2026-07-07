@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { prisma } from "../../db"
-import { tr } from "zod/locales";
-import e from "express";
+
 
 export const deleteDealer = async (
     req: Request,

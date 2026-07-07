@@ -24,10 +24,11 @@ export const createCustomer = async (
       email,
       password,
       phone,
-      alternatePhone,
       gender,
       dateOfBirth,
       address,
+      aadharNumber,
+      panNumber,
       bankName,
       ifscCode,
       accountNumber,
@@ -62,6 +63,7 @@ export const createCustomer = async (
     const hashedPassword =
       await bcrypt.hash(password, 10);
 
+      
     const user = await prisma.user.create({
       data: {
         name: customerName,
@@ -82,8 +84,6 @@ export const createCustomer = async (
 
           phone,
 
-          alternatePhone,
-
           gender,
 
           dateOfBirth:
@@ -92,6 +92,10 @@ export const createCustomer = async (
               : null,
 
           address,
+
+          aadharNumber,
+
+        panNumber,
 
           bankName,
 
