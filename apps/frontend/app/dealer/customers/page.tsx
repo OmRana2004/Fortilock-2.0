@@ -1,6 +1,6 @@
 
 
-import CustomerTable from "@/components/dealer/customer-table";
+import CustomerTable from "@/components/dealer/customers-table";
 
 
 

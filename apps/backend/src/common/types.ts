@@ -123,6 +123,8 @@ export const CreateLoanSchema = z.object({
   downPayment: z.number().min(0),
 
   tenureMonths: z.number().min(1),
+
+  interestRate: z.number().nonnegative().optional().default(0),
 });
 
 // PAY EMIs

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/axios";
 import {
@@ -86,18 +87,6 @@ export default function CustomerTable() {
     fetchCustomers();
   }, [page, search]);
 
-  const toggleStatus = async (customer: Customer) => {
-    try {
-      await api.patch(`/api/v1/dealer/customers/${customer.id}/toggle-status`);
-      setCustomers((prev) =>
-        prev.map((c) =>
-          c.id === customer.id ? { ...c, isActive: !c.isActive } : c,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   // delete
   const handleDelete = async (customer: Customer) => {
@@ -221,16 +210,13 @@ export default function CustomerTable() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() => {
-                        setSelectedCustomer(customer);
-                        setOpen(true);
-                      }}
-                      className="font-medium text-blue-600 hover:underline cursor-pointer"
-                    >
-                      {`CU${customer.id.slice(0, 6).toUpperCase()}`}
-                    </button>
-                  </td>
+  <Link
+    href={`/dealer/customers/${customer.id}`}
+    className="font-medium text-blue-600 hover:underline"
+  >
+    {`CU${customer.id.slice(0, 6).toUpperCase()}`}
+  </Link>
+</td>
 
                   <td className="px-6 py-4 font-medium text-slate-600 capitalize">
                     {customer.customerName}
