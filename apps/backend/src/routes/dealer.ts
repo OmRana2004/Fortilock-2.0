@@ -45,7 +45,7 @@ router.get(
 );
 
 router.get(
-  "/customers/:id",
+  "/customer/:id",
   authMiddleware,
   dealerMiddleware,
   getCustomerById
