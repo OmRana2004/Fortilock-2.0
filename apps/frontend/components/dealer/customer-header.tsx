@@ -4,7 +4,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 
-export default function CustomerHeader() {
+interface Customer {
+  id: string;
+  phone: string;
+  address: string;
+  isActive: boolean;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+
+interface CustomerHeaderProps {
+  customer: Customer;
+}
+
+
+export default function CustomerHeader({
+  customer,
+}: CustomerHeaderProps) {
   return (
     <div className="rounded-2xl border bg-card p-6">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -12,16 +33,22 @@ export default function CustomerHeader() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">
-              Sita Sharma
+             {customer.user.name}
             </h1>
 
-            <Badge className="bg-green-600 hover:bg-green-600">
-              Active
-            </Badge>
+            <Badge
+  className={
+    customer.isActive
+      ? "bg-green-600"
+      : "bg-red-600"
+  }
+>
+  {customer.isActive ? "Active" : "Inactive"}
+</Badge>
           </div>
 
           <p className="mt-2 text-muted-foreground">
-            Customer ID : CUS-0001
+           {customer.id}
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -31,7 +58,7 @@ export default function CustomerHeader() {
               </p>
 
               <p className="font-medium">
-                +91 9876543210
+                {customer.phone}
               </p>
             </div>
 
@@ -41,7 +68,7 @@ export default function CustomerHeader() {
               </p>
 
               <p className="font-medium">
-                sita@gmail.com
+                {customer.user.email}
               </p>
             </div>
 
@@ -51,7 +78,7 @@ export default function CustomerHeader() {
               </p>
 
               <p className="font-medium">
-                Dehradun
+                {customer.address}
               </p>
             </div>
 
@@ -61,7 +88,7 @@ export default function CustomerHeader() {
               </p>
 
               <p className="font-medium">
-                09 Jul 2026
+                {new Date(customer.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
